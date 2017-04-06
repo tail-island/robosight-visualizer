@@ -30,7 +30,7 @@
       (.setScene (Scene. (Group. [(field objects-channel)])))
       (.show))
     (async/go
-      (doseq [objects (map read-string (line-seq (java.io/reader System/in)))]
+      (doseq [objects (map read-string (line-seq (java.io/reader System/in :encoding (System/getProperty "file.encoding"))))]
         (>! objects-channel objects)
         (Thread/sleep 100)))))
 
