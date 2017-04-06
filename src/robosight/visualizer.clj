@@ -15,11 +15,10 @@
 (defn- field
   [objects-channel]
   (doto (Canvas. robosight/field-size-x robosight/field-size-y)
-    ((fn [canvas]
-       (async/go
-         (while true
-           (let [objects (<! objects-channel)]
-             (Platform/runLater #(robosight.ui/draw (.getGraphicsContext2D canvas) objects)))))))))
+    (#(async/go
+        (while true
+          (let [objects (<! objects-channel)]
+            (Platform/runLater (fn [] (robosight.ui/draw (.getGraphicsContext2D %) objects)))))))))
 
 (defn -start
   [this stage]
@@ -30,9 +29,11 @@
       (.setScene (Scene. (Group. [(field objects-channel)])))
       (.show))
     (async/go
-      (doseq [objects (map read-string (line-seq (java.io/reader System/in :encoding (System/getProperty "file.encoding"))))]
-        (>! objects-channel objects)
-        (Thread/sleep 100)))))
+      (loop [objects-string (read-line)]
+        (when objects-string
+          (>! objects-channel (read-string objects-string))
+          (Thread/sleep 100)
+          (recur (read-line)))))))
 
 (defn -main
   [& args]
