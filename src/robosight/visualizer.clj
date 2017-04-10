@@ -29,8 +29,8 @@
       (loop [state-string (read-line)]
         (when state-string
           (let [state (clojure.edn/read-string state-string)]
-            (if (coll? state)
-              (do (>! objects-channel state)
+            (if (map? state)
+              (do (>! objects-channel (:objects state))
                   (Thread/sleep 100)
                   (recur (read-line)))
               (println (pr-str state)))))))))
