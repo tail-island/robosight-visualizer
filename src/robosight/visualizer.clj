@@ -33,7 +33,7 @@
               (do (>! objects-channel state)
                   (Thread/sleep 100)
                   (recur (read-line)))
-              (println state))))))))
+              (println (pr-str state)))))))))
 
 (defn -main
   [& args]
