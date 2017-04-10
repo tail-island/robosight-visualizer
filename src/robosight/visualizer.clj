@@ -1,13 +1,10 @@
 (ns robosight.visualizer
   (:require   (clojure.core [async :as async :refer [>!! <!! >! <!]])
-              (clojure.java [io    :as java.io])
               (robosight    [core  :as robosight]
                             [ui    :as robosight.ui]))
-  (:import    (javafx.animation       AnimationTimer)
-              (javafx.application     Application Platform)
-              (javafx.scene           Group Scene)
-              (javafx.scene.canvas    Canvas)
-              (javafx.scene.transform Affine))
+  (:import    (javafx.application  Application Platform)
+              (javafx.scene        Group Scene)
+              (javafx.scene.canvas Canvas))
   (:gen-class :name    com.tail_island.robosight.Visualizer
               :extends javafx.application.Application
               :main    true))
@@ -29,11 +26,14 @@
       (.setScene (Scene. (Group. [(field objects-channel)])))
       (.show))
     (async/go
-      (loop [objects-string (read-line)]
-        (when objects-string
-          (>! objects-channel (read-string objects-string))
-          (Thread/sleep 100)
-          (recur (read-line)))))))
+      (loop [state-string (read-line)]
+        (when state-string
+          (let [state (clojure.edn/read-string state-string)]
+            (if (coll? state)
+              (do (>! objects-channel state)
+                  (Thread/sleep 100)
+                  (recur (read-line)))
+              (println state))))))))
 
 (defn -main
   [& args]
