@@ -25,15 +25,14 @@
       (.setResizable false)
       (.setScene (Scene. (Group. [(field objects-channel)])))
       (.show))
-    (async/go
-      (loop [state-string (read-line)]
-        (when state-string
-          (let [state (clojure.edn/read-string state-string)]
-            (if (map? state)
-              (do (>! objects-channel (:objects state))
-                  (Thread/sleep 100)
-                  (recur (read-line)))
-              (println (pr-str state)))))))))
+    (async/go-loop [state-string (read-line)]
+      (when state-string
+        (let [state (clojure.edn/read-string state-string)]
+          (if (map? state)
+            (do (>! objects-channel (:objects state))
+                (Thread/sleep 100)
+                (recur (read-line)))
+            (println (pr-str state))))))))
 
 (defn -main
   [& args]
