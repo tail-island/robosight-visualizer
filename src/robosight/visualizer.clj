@@ -25,14 +25,16 @@
       (.setResizable false)
       (.setScene (Scene. (Group. [(field objects-channel)])))
       (.show))
-    (async/go-loop [state-string (read-line)]
-      (when state-string
-        (let [state (clojure.edn/read-string state-string)]
-          (if (map? state)
-            (do (>! objects-channel (:objects state))
-                (Thread/sleep 100)
-                (recur (read-line)))
-            (println (pr-str state))))))))
+    (async/go-loop [game-info-string (read-line)]
+      (let [game-info (clojure.edn/read-string game-info-string)]
+        (if-let [state (:state game-info)]
+          (do (>! objects-channel (:objects state))
+              (Thread/sleep 100)
+              (recur (read-line)))
+          (println (case (:winner game-info)
+                     0 "Left team win!"
+                     1 "Right team win!"
+                     "No agme...")))))))
 
 (defn -main
   [& args]
