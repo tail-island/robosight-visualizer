@@ -34,7 +34,7 @@
           (println (case (:winner game-info)
                      0 "Left team win!"
                      1 "Right team win!"
-                     "No agme...")))))))
+                     "No game...")))))))
 
 (defn -main
   [& args]
